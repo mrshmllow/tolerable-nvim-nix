@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
     nightly.url = "github:nix-community/neovim-nightly-overlay";
-    flake-compat.url = "github:nix-community/flake-compat";
+    flake-compat.url = "https://git.lix.systems/lix-project/flake-compat/archive/main.tar.gz";
   };
 
   outputs =

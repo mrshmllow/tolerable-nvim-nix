@@ -25,7 +25,7 @@
     in
     rec {
       packages = forAllSystems (pkgs: {
-        nightly = inputs.nightly.packages.${pkgs.system}.neovim.overrideAttrs (old: {
+        nightly = inputs.nightly.packages.${pkgs.stdenv.hostPlatform.system}.neovim.overrideAttrs (old: {
           patches = old.pactches or [ ] ++ [ ./PATCH.patch ];
         });
 
@@ -36,7 +36,9 @@
 
       makeNightlyNeovimConfig =
         appname: args:
-        makeNeovimConfig appname (args // { package = packages.${args.pkgs.system}.nightly; });
+        makeNeovimConfig appname (
+          args // { package = packages.${args.pkgs.stdenv.hostPlatform.system}.nightly; }
+        );
 
       makeNeovimConfig =
         appname:
@@ -53,7 +55,7 @@
         }:
         let
           _config = pkgs.neovimUtils.makeNeovimConfig (config // { wrapRc = false; });
-          _package = if package == null then packages.${pkgs.system}.stable else package;
+          _package = if package == null then packages.${pkgs.stdenv.hostPlatform.system}.stable else package;
           wrappedPackage = pkgs.wrapNeovimUnstable _package _config;
         in
         wrappedPackage.overrideAttrs (old: {

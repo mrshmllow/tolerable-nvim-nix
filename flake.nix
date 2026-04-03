@@ -26,18 +26,18 @@
     rec {
       packages = forAllSystems (pkgs: {
         nightly = inputs.nightly.packages.${pkgs.stdenv.hostPlatform.system}.neovim.overrideAttrs (old: {
-          patches = old.pactches or [ ] ++ [ ./PATCH.patch ];
+          patches = (old.patches or [ ]) ++ [ ./PATCH.patch ];
         });
 
         stable = pkgs.neovim-unwrapped.overrideAttrs (old: {
-          patches = old.pactches or [ ] ++ [ ./PATCH.patch ];
+          patches = (old.patches or [ ]) ++ [ ./PATCH.patch ];
         });
       });
 
       makeNightlyNeovimConfig =
         appname: args:
         makeNeovimConfig appname (
-          args // { package = packages.${args.pkgs.stdenv.hostPlatform.system}.nightly; }
+          { package = packages.${args.pkgs.stdenv.hostPlatform.system}.nightly; } // args
         );
 
       makeNeovimConfig =
@@ -45,7 +45,7 @@
         {
           pkgs,
           config,
-          package ? null,
+          package ? packages.${pkgs.stdenv.hostPlatform.system}.stable,
           buildInputs ? [ ],
           doCheck ? true,
           path ? [ ],
@@ -54,9 +54,7 @@
           ...
         }:
         let
-          _config = pkgs.neovimUtils.makeNeovimConfig (config // { wrapRc = false; });
-          _package = if package == null then packages.${pkgs.stdenv.hostPlatform.system}.stable else package;
-          wrappedPackage = pkgs.wrapNeovimUnstable _package _config;
+          wrappedPackage = pkgs.wrapNeovimUnstable package (config // { wrapRc = false; });
         in
         wrappedPackage.overrideAttrs (old: {
           generatedWrapperArgs = old.generatedWrapperArgs or [ ] ++ [

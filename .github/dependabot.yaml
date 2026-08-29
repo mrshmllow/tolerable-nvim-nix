@@ -11,3 +11,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/templates/stable"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "nix"
+    directory: "/templates/nightly"
+    schedule:
+      interval: "monthly"
